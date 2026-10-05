@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7710072482126233714}
   - component: {fileID: 1988906915292825771}
   - component: {fileID: 6251121269693238934}
+  - component: {fileID: 3317739795230890999}
   m_Layer: 9
   m_Name: Evidence_E03_PackingLabel
   m_TagString: Untagged
@@ -155,7 +156,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable
   m_InteractionManager: {fileID: 0}
-  m_Colliders: []
+  m_Colliders:
+  - {fileID: 3189049688961470878}
   m_InteractionLayers:
     m_Bits: 1
   m_DistanceCalculationMode: 1
@@ -288,3 +290,16 @@ MonoBehaviour:
   m_Title: Torn packing label
   m_Description: Matches the prototype container; supports what was moved.
   m_RequiresUV: 0
+--- !u!114 &3317739795230890999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4706469510926373003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a88b11d2feb72c499cb7243da543ee2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CSIVR.Core.HoverHighlight
+  m_HoverColor: {r: 1, g: 0.9, b: 0.2, a: 1}
