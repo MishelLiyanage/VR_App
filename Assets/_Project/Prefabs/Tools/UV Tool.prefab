@@ -173,7 +173,6 @@ GameObject:
   - component: {fileID: 1708605645971256990}
   - component: {fileID: 5839955095092337189}
   - component: {fileID: 1538168272368258263}
-  - component: {fileID: 3308380048446741542}
   m_Layer: 0
   m_Name: UV Tool
   m_TagString: Untagged
@@ -264,8 +263,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable
   m_InteractionManager: {fileID: 0}
-  m_Colliders:
-  - {fileID: 1708605645971256990}
+  m_Colliders: []
   m_InteractionLayers:
     m_Bits: 1
   m_DistanceCalculationMode: 1
@@ -413,19 +411,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Status: Off
---- !u!114 &3308380048446741542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1880844560521118532}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a88b11d2feb72c499cb7243da543ee2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CSIVR.Core.HoverHighlight
-  m_HoverColor: {r: 1, g: 0.9, b: 0.2, a: 1}
 --- !u!1 &2967874185877574722
 GameObject:
   m_ObjectHideFlags: 0
