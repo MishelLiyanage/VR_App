@@ -1,0 +1,79 @@
+newmtl Asphalt
+Ka 0.02100 0.02300 0.02600
+Kd 0.105 0.115 0.13
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl Chalk
+Ka 0.18800 0.18800 0.17600
+Kd 0.94 0.94 0.88
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl Blood
+Ka 0.08600 0.00160 0.00360
+Kd 0.43 0.008 0.018
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl EvidenceYellow
+Ka 0.20000 0.15800 0.00500
+Kd 1 0.79 0.025
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl Lettering
+Ka 0.00240 0.00280 0.00340
+Kd 0.012 0.014 0.017
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl Footprints
+Ka 0.00940 0.01000 0.01140
+Kd 0.047 0.05 0.057
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl Gunmetal
+Ka 0.02400 0.02800 0.03200
+Kd 0.12 0.14 0.16
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl Steel
+Ka 0.10400 0.11200 0.11600
+Kd 0.52 0.56 0.58
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl Grip
+Ka 0.00700 0.00540 0.00440
+Kd 0.035 0.027 0.022
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl Brass
+Ka 0.13400 0.08800 0.02400
+Kd 0.67 0.44 0.12
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2

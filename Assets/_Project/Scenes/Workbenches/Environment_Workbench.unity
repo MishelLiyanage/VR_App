@@ -478,8 +478,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f083e1200e168148be243b8ea094452, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorOpenSound
-  openingClip: {fileID: 8300000, guid: 56a885983ed931e4482ea73e099b4c87, type: 3}
-  openAngleThreshold: 1
 --- !u!82 &107829295
 AudioSource:
   m_ObjectHideFlags: 0
@@ -491,7 +489,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 82596f7cc2804774a82e7212b61365fc, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -4862,7 +4860,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 28a0de8d6c6521d44be01ba740b406bd, type: 3}
+  m_Resource: {fileID: 8300000, guid: c87a3e5fc46cdd643a0dea9832a5a8cc, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.15
   m_Pitch: 1
@@ -6872,8 +6870,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f083e1200e168148be243b8ea094452, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorOpenSound
-  openingClip: {fileID: 8300000, guid: 56a885983ed931e4482ea73e099b4c87, type: 3}
-  openAngleThreshold: 1
 --- !u!82 &4000000010
 AudioSource:
   m_ObjectHideFlags: 0
