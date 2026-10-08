@@ -22,7 +22,7 @@ namespace CSIVR.EditorTools
     /// defaults, teleport anchors, room shell and the integration parents other members drop prefabs into.
     /// Re-running rebuilds the scene from scratch.
     /// </summary>
-    public static class MainSceneBuilder
+    public static partial class MainSceneBuilder
     {
         const string ProjectRoot = "Assets/_Project";
         const string ScenePath = ProjectRoot + "/Scenes/Main.unity";
@@ -42,23 +42,11 @@ namespace CSIVR.EditorTools
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-            var floorMat = MakeMaterial("RoomFloor", new Color(0.32f, 0.33f, 0.35f));
-            var wallMat = MakeMaterial("RoomWall", new Color(0.78f, 0.78f, 0.74f));
-            var propMat = MakeMaterial("PlaceholderProp", new Color(0.45f, 0.36f, 0.27f));
-            var boardMat = MakeMaterial("PlaceholderBoard", new Color(0.1f, 0.2f, 0.3f));
             var rayMat = MakeMaterial("DesktopRay", new Color(0.35f, 0.8f, 1f));
 
-            BuildLighting();
             var systems = new GameObject("Systems").transform;
             var rigs = new GameObject("Rigs").transform;
-            var environment = new GameObject("Environment").transform;
-            var anchors = new GameObject("Teleport Anchors").transform;
-            new GameObject("Evidence");
-            new GameObject("Tools");
-            new GameObject("UI");
-
-            BuildRoom(environment, floorMat, wallMat, propMat, boardMat);
-            BuildAnchors(anchors);
+            BuildWorld(systems);
 
             var interactionManager = new GameObject("XR Interaction Manager", typeof(XRInteractionManager));
             interactionManager.transform.SetParent(systems);
@@ -172,6 +160,8 @@ namespace CSIVR.EditorTools
             var so = new SerializedObject(go.GetComponent<ModeBootstrap>());
             so.FindProperty("m_XRRig").objectReferenceValue = xrRig;
             so.FindProperty("m_DesktopRig").objectReferenceValue = desktopRig;
+            // Team has no headsets: default to keyboard/mouse so a rebuild never falls back to Auto (simulator).
+            so.FindProperty("m_Mode").enumValueIndex = (int)CSIVR.Input.RigMode.Desktop;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -194,59 +184,19 @@ namespace CSIVR.EditorTools
         static readonly Vector3 StartPosition = new Vector3(-1.6f, 0f, -1.0f);
         static readonly Quaternion StartRotation = Quaternion.Euler(0f, 270f, 0f);
 
-        static void BuildLighting()
-        {
-            var lightGO = new GameObject("Directional Light", typeof(Light));
-            var l = lightGO.GetComponent<Light>();
-            l.type = LightType.Directional;
-            l.intensity = 1.0f;
-            l.shadows = LightShadows.Soft;
-            lightGO.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
-        }
-
-        // 8 m x 7 m room, 3 m ceiling, 1 unit = 1 m. Member 2 replaces the placeholders with real visuals.
-        static void BuildRoom(Transform parent, Material floorMat, Material wallMat, Material propMat, Material boardMat)
-        {
-            int env = LayerMask.NameToLayer(EnvironmentLayer);
-
-            Box("Floor", parent, new Vector3(0f, -0.05f, 0f), new Vector3(8f, 0.1f, 7f), floorMat, env);
-            Box("Wall North", parent, new Vector3(0f, 1.5f, 3.55f), new Vector3(8.2f, 3f, 0.1f), wallMat, env);
-            Box("Wall South", parent, new Vector3(0f, 1.5f, -3.55f), new Vector3(8.2f, 3f, 0.1f), wallMat, env);
-            Box("Wall East", parent, new Vector3(4.05f, 1.5f, 0f), new Vector3(0.1f, 3f, 7f), wallMat, env);
-            Box("Wall West", parent, new Vector3(-4.05f, 1.5f, 0f), new Vector3(0.1f, 3f, 7f), wallMat, env);
-            Box("Ceiling", parent, new Vector3(0f, 3.05f, 0f), new Vector3(8.2f, 0.1f, 7.2f), wallMat, env);
-
-            var props = new GameObject("Placeholders (Member 2 replaces)").transform;
-            props.SetParent(parent);
-            Box("Desk", props, new Vector3(2.6f, 0.375f, -2.0f), new Vector3(0.8f, 0.75f, 1.6f), propMat, env);
-            Box("Shelf", props, new Vector3(-2.2f, 1.0f, 3.25f), new Vector3(2.0f, 2.0f, 0.4f), propMat, env);
-            Box("Cabinet", props, new Vector3(2.2f, 0.9f, 3.2f), new Vector3(1.2f, 1.8f, 0.6f), propMat, env);
-            Box("Evidence Station Table", props, new Vector3(3.3f, 0.45f, 0.0f), new Vector3(0.7f, 0.9f, 1.0f), propMat, env);
-            Box("Briefing Board", props, new Vector3(-3.95f, 1.7f, -1.0f), new Vector3(0.05f, 1.2f, 2.4f), boardMat, env);
-        }
-
-        static void BuildAnchors(Transform parent)
-        {
-            // Anchors face their task. Yaw is the direction the player looks after teleporting.
-            Anchor("Anchor Briefing", parent, new Vector3(-1.6f, 0f, -1.0f), 270f);
-            Anchor("Anchor Desk", parent, new Vector3(1.2f, 0f, -2.0f), 90f);
-            Anchor("Anchor Shelf", parent, new Vector3(-2.2f, 0f, 1.6f), 0f);
-            Anchor("Anchor Cabinet", parent, new Vector3(2.2f, 0f, 1.6f), 0f);
-            Anchor("Anchor Evidence Station", parent, new Vector3(1.9f, 0f, 0.0f), 90f);
-        }
-
-        static void Anchor(string name, Transform parent, Vector3 position, float yaw)
+        static GameObject Anchor(string name, Transform parent, Vector3 position, float yaw)
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{StarterAssets}/DemoAssets/Prefabs/Teleport/Teleport Anchor.prefab");
             if (prefab == null)
             {
                 Debug.LogWarning("[MainSceneBuilder] Teleport Anchor prefab not found.");
-                return;
+                return null;
             }
             var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             go.name = name;
             go.transform.SetParent(parent);
             go.transform.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f));
+            return go;
         }
 
         static GameObject Box(string name, Transform parent, Vector3 pos, Vector3 size, Material mat, int layer)
@@ -281,7 +231,7 @@ namespace CSIVR.EditorTools
 
         static void EnsureFolders()
         {
-            foreach (var sub in new[] { "Scenes", "Scenes/Workbenches", "Materials", "Prefabs", "Scripts", "Audio", "Data", "Input" })
+            foreach (var sub in new[] { "Scenes", "Scenes/Workbenches", "Materials", "Prefabs", "Prefabs/Evidence", "Prefabs/Tools", "Scripts", "Audio", "Data", "Input" })
             {
                 var path = $"{ProjectRoot}/{sub}";
                 if (!AssetDatabase.IsValidFolder(path))
@@ -316,16 +266,22 @@ namespace CSIVR.EditorTools
             tagManager.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        static Material MakeMaterial(string name, Color color)
+        static Material MakeMaterial(string name, Color color, float metallic = 0f, float smoothness = 0.25f)
         {
             var path = $"{ProjectRoot}/Materials/{name}.mat";
             var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
-            if (mat != null) return mat;
-
-            var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-            mat = new Material(shader) { color = color };
+            bool isNew = mat == null;
+            if (isNew)
+            {
+                var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+                mat = new Material(shader);
+            }
+            mat.color = color;
             if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", color);
-            AssetDatabase.CreateAsset(mat, path);
+            if (mat.HasProperty("_Metallic")) mat.SetFloat("_Metallic", metallic);
+            if (mat.HasProperty("_Smoothness")) mat.SetFloat("_Smoothness", smoothness);
+            if (isNew) AssetDatabase.CreateAsset(mat, path);
+            else EditorUtility.SetDirty(mat);
             return mat;
         }
     }
