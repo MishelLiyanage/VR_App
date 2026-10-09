@@ -107,6 +107,7 @@ namespace CSIVR.Interface
             button.onClick.AddListener(onClick);
 
             var text = CreateText(go.transform, "Label", fontSize, TextAlignmentOptions.Center, Color.white);
+            text.text = label;
             text.fontStyle = FontStyles.Bold;
             Stretch((RectTransform)text.transform, 10, 10, 4, 4);
             return button;
