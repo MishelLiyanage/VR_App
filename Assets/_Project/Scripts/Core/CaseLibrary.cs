@@ -54,7 +54,7 @@ namespace CSIVR.Core
                 if (a.Id == id) return a;
             return Answers[Answers.Length - 1];
         }
-    }F
+    }
 
     /// <summary>Fictional case content, kept in one place so wording is easy to edit.</summary>
     public static class CaseLibrary
