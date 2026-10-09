@@ -5,7 +5,7 @@ using UnityEngine.XR.Interaction.Toolkit.Inputs.Simulation;
 
 namespace CSIVR.Input
 {
-    public enum PlayMode
+    public enum RigMode
     {
         /// <summary>Editor: XR Interaction Simulator. Player build: Desktop (keyboard and mouse).</summary>
         Auto,
@@ -21,17 +21,17 @@ namespace CSIVR.Input
     [DefaultExecutionOrder(-1000)]
     public class ModeBootstrap : MonoBehaviour
     {
-        [SerializeField] PlayMode m_Mode = PlayMode.Auto;
+        [SerializeField] RigMode m_Mode = RigMode.Auto;
         [SerializeField] GameObject m_XRRig;
         [SerializeField] GameObject m_DesktopRig;
 
-        public static PlayMode ActiveMode { get; private set; }
+        public static RigMode ActiveMode { get; private set; }
 
         void Awake()
         {
             ActiveMode = Resolve(m_Mode);
 
-            bool useXR = ActiveMode != PlayMode.Desktop;
+            bool useXR = ActiveMode != RigMode.Desktop;
             if (m_XRRig != null)
                 m_XRRig.SetActive(useXR);
             if (m_DesktopRig != null)
@@ -39,7 +39,7 @@ namespace CSIVR.Input
 
             // The simulator auto-loads in the Editor; it must not run alongside the desktop rig,
             // and a headset build does not need it.
-            if (ActiveMode == PlayMode.Desktop || ActiveMode == PlayMode.Headset)
+            if (ActiveMode == RigMode.Desktop || ActiveMode == RigMode.Headset)
             {
                 var sim = FindAnyObjectByType<XRInteractionSimulator>(FindObjectsInactive.Include);
                 if (sim != null)
@@ -48,7 +48,7 @@ namespace CSIVR.Input
 
             // "Initialize XR on Startup" is off so the Desktop build runs without a headset.
             // Headset mode therefore starts the XR loader itself.
-            if (ActiveMode == PlayMode.Headset)
+            if (ActiveMode == RigMode.Headset)
                 StartCoroutine(InitializeXR());
 
             Debug.Log($"[ModeBootstrap] Active mode: {ActiveMode}");
@@ -71,7 +71,7 @@ namespace CSIVR.Input
 
         void OnDestroy()
         {
-            if (ActiveMode == PlayMode.Headset && XRGeneralSettings.Instance != null && XRGeneralSettings.Instance.Manager != null)
+            if (ActiveMode == RigMode.Headset && XRGeneralSettings.Instance != null && XRGeneralSettings.Instance.Manager != null)
             {
                 var manager = XRGeneralSettings.Instance.Manager;
                 if (manager.isInitializationComplete)
@@ -82,14 +82,14 @@ namespace CSIVR.Input
             }
         }
 
-        static PlayMode Resolve(PlayMode requested)
+        static RigMode Resolve(RigMode requested)
         {
-            if (requested != PlayMode.Auto)
+            if (requested != RigMode.Auto)
                 return requested;
 #if UNITY_EDITOR
-            return PlayMode.EditorSimulator;
+            return RigMode.EditorSimulator;
 #else
-            return PlayMode.Desktop;
+            return RigMode.Desktop;
 #endif
         }
     }
