@@ -4,6 +4,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
+using CSIVR.Core;
 
 namespace CSIVR.Input
 {
@@ -158,6 +159,9 @@ namespace CSIVR.Input
             m_Hand.uiPressInput.QueueManualState(primary && overUI, primary && overUI ? 1f : 0f);
             m_Hand.activateInput.QueueManualState(primary && !overUI && !m_TeleportAiming, primary && !overUI ? 1f : 0f);
             m_Hand.selectInput.QueueManualState(select, select ? 1f : 0f);
+
+            if (m_Activate.WasPressedThisFrame() && !overUI && !m_TeleportAiming && m_Hand.hasSelection)
+                CaseManager.Instance?.ReportTutorialAction(TutorialAction.ActivateTool);
         }
 
         void RotateHeldObject(Vector2 delta)
@@ -181,6 +185,7 @@ namespace CSIVR.Input
         {
             m_HandAttach.localRotation = Quaternion.identity;
             m_HandAttach.localPosition = m_HandAttachStartLocalPos;
+            CaseManager.Instance?.ReportTutorialAction(TutorialAction.GrabRelease);
         }
 
         // Hold T to aim at an anchor/area, release to confirm. Same destinations the XR teleport uses.
@@ -211,6 +216,7 @@ namespace CSIVR.Input
             m_Controller.enabled = false;
             transform.SetPositionAndRotation(destination, yaw);
             m_Controller.enabled = true;
+            CaseManager.Instance?.ReportTutorialAction(TutorialAction.Teleport);
         }
 
         void OnGUI()
