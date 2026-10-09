@@ -5,6 +5,7 @@ namespace CSIVR.Core
     public struct EvidenceInfo
     {
         public string Title;
+        public string Description;
         public string Observation;
         public string Hint;
     }
@@ -77,24 +78,28 @@ namespace CSIVR.Core
                     ["E01"] = new EvidenceInfo
                     {
                         Title = "Access card",
+                        Description = "Blue plastic access card with a white strip. The printed ID reads B-17.",
                         Observation = "Card identifier B-17. Finding a card does not identify who used it.",
                         Hint = "Look for a small card near the desk.",
                     },
                     ["E02"] = new EvidenceInfo
                     {
                         Title = "Access log",
+                        Description = "Printed access log. One line reads: B-17, status OK, 19:42.",
                         Observation = "The log records successful B-17 access at 19:42.",
                         Hint = "Check the printed log on the desktop.",
                     },
                     ["E03"] = new EvidenceInfo
                     {
                         Title = "Torn packing label",
+                        Description = "Torn packing label. The printed words read PROTOTYPE CONTAINER.",
                         Observation = "The label matches the prototype container. It supports what was moved.",
                         Hint = "Inspect the shelf for packaging.",
                     },
                     ["E04"] = new EvidenceInfo
                     {
                         Title = "UV transfer mark",
+                        Description = "A faint violet smear on the cabinet handle under UV light.",
                         Observation = "A transfer mark on the cabinet handle shows it was touched.",
                         Hint = "Use the UV scanner on the cabinet handle.",
                     },
@@ -148,24 +153,28 @@ namespace CSIVR.Core
                     ["E05"] = new EvidenceInfo
                     {
                         Title = "Maintenance ticket",
+                        Description = "Maintenance ticket form number 4471. The scheduled work box is empty.",
                         Observation = "No camera maintenance was scheduled for this evening.",
                         Hint = "Look for paperwork on the console desk.",
                     },
                     ["E06"] = new EvidenceInfo
                     {
                         Title = "Camera status report",
+                        Description = "Camera 3 status report. Power lost at 19:40. No network or software fault is listed.",
                         Observation = "Camera 3 lost power at 19:40. Network and software logs show no faults.",
                         Hint = "Check the report on the side table.",
                     },
                     ["E07"] = new EvidenceInfo
                     {
                         Title = "Cable tag",
+                        Description = "Orange cable tag. It reads CAM-3 POWER.",
                         Observation = "The tag reads CAM-3 POWER. It identifies the switch that feeds the camera.",
                         Hint = "Inspect the shelf by the east wall.",
                     },
                     ["E08"] = new EvidenceInfo
                     {
                         Title = "UV transfer mark",
+                        Description = "A faint violet smear on the CAM-3 power switch under UV light.",
                         Observation = "A transfer mark on the CAM-3 power switch shows it was touched.",
                         Hint = "Use the UV scanner on the CAM-3 power switch.",
                     },

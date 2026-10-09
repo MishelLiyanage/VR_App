@@ -936,10 +936,10 @@ PlayerSettings:
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
   enableDirectStorage: 0
-  cloudProjectId: cdf53024-9ea3-4a34-9072-2d86703a2627
+  cloudProjectId: 239ee432-4df6-4efd-b24f-79cf98c436f4
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: My project
+  projectName: VR_App
   organizationId: mailtomishel
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
