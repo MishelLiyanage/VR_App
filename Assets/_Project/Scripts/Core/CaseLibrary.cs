@@ -66,7 +66,7 @@ namespace CSIVR.Core
                 Name = "CASE 01",
                 Title = "The Missing Prototype",
                 BriefingText =
-                    "A prototype has disappeared from this small research office.\n\n" +
+                    "A researcher was found dead in this small research office late last night.\n\n" +
                     "You are a trainee investigator. Inspect the room, record FOUR clues at the evidence station, " +
                     "then choose the entry route the evidence best supports.\n\n" +
                     "This case is fictional. Press Start for a short practice.",
