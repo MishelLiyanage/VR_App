@@ -40,7 +40,8 @@ namespace CSIVR.Interface
 
         TextMeshProUGUI m_ChipText, m_Title, m_Body, m_Side;
         RectTransform m_ButtonRow, m_Rows;
-        GameObject m_SideCard, m_IconRoot;
+        GameObject m_SideCard, m_IconRoot, m_PhotoRoot;
+        Image m_PhotoImage;
         Image m_IconCircle, m_IconGlyph;
         Image[] m_Dots;
 
@@ -333,6 +334,14 @@ namespace CSIVR.Interface
             m_IconGlyph = SpatialUI.CreateImage(m_IconCircle.transform, "Glyph", UISprites.Check, Color.white, false);
             SpatialUI.Stretch(m_IconGlyph.rectTransform, 10, 10, 10, 10);
 
+            // Mug shot for the case 2 reveal: a framed picture in the same spot as the result icon, but larger.
+            var photoFrame = SpatialUI.CreateImage(content, "Photo Frame", UISprites.Rounded, SpatialUI.Frame);
+            SpatialUI.TopLeft(photoFrame.rectTransform, 0, 0, 212, 212);
+            m_PhotoRoot = photoFrame.gameObject;
+            m_PhotoImage = SpatialUI.CreateImage(photoFrame.transform, "Photo", null, Color.white, false);
+            m_PhotoImage.preserveAspect = true;
+            SpatialUI.Stretch(m_PhotoImage.rectTransform, 6, 6, 6, 6);
+
             // Buttons.
             var row = new GameObject("Buttons", typeof(RectTransform), typeof(HorizontalLayoutGroup));
             row.transform.SetParent(root, false);
@@ -396,15 +405,16 @@ namespace CSIVR.Interface
             RefreshStation();
         }
 
-        void SetLayout(bool body, bool rows, bool side, bool icon)
+        void SetLayout(bool body, bool rows, bool side, bool icon, bool photo = false)
         {
+            m_PhotoRoot.SetActive(photo);
             m_Body.gameObject.SetActive(body);
             m_Rows.gameObject.SetActive(rows);
             m_SideCard.SetActive(side);
             m_IconRoot.SetActive(icon);
             m_Body.enableAutoSizing = false;
             // Text leaves room for the icon in the debrief.
-            SpatialUI.Stretch(m_Body.rectTransform, icon ? 150f : 0f, 0f, 0f, 0f);
+            SpatialUI.Stretch(m_Body.rectTransform, photo ? 232f : icon ? 150f : 0f, 0f, 0f, 0f);
         }
 
         void UpdateDots()
@@ -560,7 +570,12 @@ namespace CSIVR.Interface
             var r = m_Case.LastResult;
             bool correct = r != null && r.Correct;
             m_Title.text = correct ? $"{Def.Name} complete" : "Finding not supported";
-            SetLayout(body: true, rows: false, side: false, icon: true);
+            // Case 2: once the finding is right and the fingerprint has been matched, show the culprit's photo instead of the icon.
+            var criminal = m_CaseIndex == 1 && correct ? m_Case.Criminal : null;
+            var photo = CriminalDatabase.LoadPhoto(criminal);
+            bool showPhoto = criminal != null && photo != null;
+            SetLayout(body: true, rows: false, side: false, icon: !showPhoto, photo: showPhoto);
+            if (showPhoto) m_PhotoImage.sprite = photo;
             m_IconCircle.color = correct ? SpatialUI.Teal : SpatialUI.Amber;
             m_IconGlyph.sprite = correct ? UISprites.Check : UISprites.Cross;
             m_Body.fontSize = 29f;
@@ -580,6 +595,11 @@ namespace CSIVR.Interface
                 sb.AppendLine($"Finding: <b><color=#14958b>{r.AnswerLabel}</color></b>");
                 sb.AppendLine(r.Explanation);
                 sb.AppendLine($"<size=85%><color=#617388>Still unknown: {r.StillUnknown}</color></size>");
+                if (criminal != null)
+                {
+                    sb.AppendLine();
+                    sb.AppendLine(CriminalDatabase.RevealText(criminal, m_Case.CardHolder));
+                }
                 if (m_CaseIndex == 0 && m_Case.CardHolder != null)
                     sb.AppendLine($"<size=85%><color=#617388>{SuspectRegistry.DebriefNote(m_Case.CardHolder)}</color></size>");
                 if (correct)
