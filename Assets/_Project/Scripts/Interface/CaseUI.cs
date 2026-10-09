@@ -402,6 +402,7 @@ namespace CSIVR.Interface
             m_Rows.gameObject.SetActive(rows);
             m_SideCard.SetActive(side);
             m_IconRoot.SetActive(icon);
+            m_Body.enableAutoSizing = false;
             // Text leaves room for the icon in the debrief.
             SpatialUI.Stretch(m_Body.rectTransform, icon ? 150f : 0f, 0f, 0f, 0f);
         }
@@ -563,6 +564,10 @@ namespace CSIVR.Interface
             m_IconCircle.color = correct ? SpatialUI.Teal : SpatialUI.Amber;
             m_IconGlyph.sprite = correct ? UISprites.Check : UISprites.Cross;
             m_Body.fontSize = 29f;
+            // The registry note makes this the longest view, so let the text shrink to stay above the buttons.
+            m_Body.enableAutoSizing = true;
+            m_Body.fontSizeMin = 18f;
+            m_Body.fontSizeMax = 29f;
 
             if (r == null)
             {
@@ -575,6 +580,8 @@ namespace CSIVR.Interface
                 sb.AppendLine($"Finding: <b><color=#14958b>{r.AnswerLabel}</color></b>");
                 sb.AppendLine(r.Explanation);
                 sb.AppendLine($"<size=85%><color=#617388>Still unknown: {r.StillUnknown}</color></size>");
+                if (m_CaseIndex == 0 && m_Case.CardHolder != null)
+                    sb.AppendLine($"<size=85%><color=#617388>{SuspectRegistry.DebriefNote(m_Case.CardHolder)}</color></size>");
                 if (correct)
                     sb.Append(m_Case.IsFinalCase
                         ? "\n<b>All cases solved. Well done, investigator.</b>"
