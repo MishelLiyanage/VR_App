@@ -54,7 +54,7 @@ namespace CSIVR.Core
                 if (a.Id == id) return a;
             return Answers[Answers.Length - 1];
         }
-    }
+    }F
 
     /// <summary>Fictional case content, kept in one place so wording is easy to edit.</summary>
     public static class CaseLibrary
@@ -64,7 +64,7 @@ namespace CSIVR.Core
             new CaseDefinition
             {
                 Name = "CASE 01",
-                Title = "The Missing Prototype",
+                Title = "The Murder Scene",
                 BriefingText =
                     "A researcher was found dead in this small research office late last night.\n\n" +
                     "You are a trainee investigator. Inspect the room, record FOUR clues at the evidence station, " +
@@ -251,10 +251,7 @@ namespace CSIVR.Core
             "XR Interaction Toolkit 3.x and Starter Assets sample - Unity Technologies\n" +
             "OpenXR Plugin, XR Plug-in Management, Input System, TextMesh Pro - Unity Technologies\n\n" +
             "CONTENT\n" +
-            "All rooms and props are original Unity primitives. Textures, UI shapes and sounds are generated in code.\n" +
-            "The UV scanner is a simplified fictional training device, not a forensic instrument.\n\n" +
-            "AI USE\n" +
-            "Planning and code drafting assisted by Claude (Anthropic) through Claude Code. " +
-            "Each owner reviews, tests and can explain their assisted code.";
+            "All rooms and props are original Unity primitives. Textures, UI shapes and sounds are implemented in code.\n" +
+            "The UV scanner is a simplified fictional training device, not a forensic instrument.\n\n";
     }
 }
