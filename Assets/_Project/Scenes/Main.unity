@@ -354,6 +354,7 @@ GameObject:
   - component: {fileID: 13044366}
   - component: {fileID: 13044367}
   - component: {fileID: 13044368}
+  - component: {fileID: 13044369}
   m_Layer: 0
   m_Name: Lamp Light
   m_TagString: Untagged
@@ -441,6 +442,25 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
+--- !u!114 &13044369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 13044365}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a76f550738b4d9fbf2f261db22bc850, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_LampRenderer: {fileID: 195975388}
+  m_MinPause: 1.5
+  m_MaxPause: 4
+  m_MinPulses: 2
+  m_MaxPulses: 4
+  m_MinPulseDuration: 0.05
+  m_MaxPulseDuration: 0.14
 --- !u!114 &13044368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3844,7 +3864,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1.0000001, y: 1.0000002, z: 6.1232336e-17}
   m_Center: {x: -0.000000014901161, y: 0, z: 0}
