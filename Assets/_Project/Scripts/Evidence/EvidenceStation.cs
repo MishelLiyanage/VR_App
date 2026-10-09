@@ -1,3 +1,4 @@
+using System.Collections;
 using CSIVR.Core;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -67,7 +68,37 @@ namespace CSIVR.Evidence
             {
                 Accept(item, grab);
                 manager.Notify($"{item.Id} recorded: {CaseLibrary.Info(item.Id).Observation}");
+
+                // The access card is also run through the staff registry, like a fingerprint against a database.
+                var cardId = SuspectRegistry.CardIdFor(item.Id);
+                if (cardId != null)
+                    StartCoroutine(RunRegistryLookup(manager, cardId));
             }
+        }
+
+        IEnumerator RunRegistryLookup(CaseManager manager, string cardId)
+        {
+            // Let the "recorded" note be read first, then show a short search before the result.
+            yield return new WaitForSeconds(1.2f);
+
+            const int steps = 8;
+            for (int i = 1; i <= steps; i++)
+            {
+                manager.Notify($"Searching staff card registry...  {i * 100 / steps}%");
+                AudioFx.PlayAt(AudioFx.Click, transform.position, 0.5f);
+                yield return new WaitForSeconds(0.3f);
+            }
+
+            var record = SuspectRegistry.FindByCard(cardId);
+            if (record == null)
+            {
+                manager.Notify($"Card {cardId}: no match in the staff registry.");
+                yield break;
+            }
+
+            manager.ReportCardHolder(record);
+            AudioFx.PlayAt(AudioFx.Chime, transform.position);
+            manager.Notify(SuspectRegistry.ResultText(record));
         }
 
         void Accept(EvidenceItem item, XRGrabInteractable grab)
