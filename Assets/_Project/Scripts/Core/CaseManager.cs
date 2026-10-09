@@ -22,6 +22,8 @@ namespace CSIVR.Core
         public int CaseIndex { get; private set; }
         public CaseState State { get; private set; } = CaseState.Briefing;
         public SubmitResult LastResult { get; private set; }
+        /// <summary>Who the access card is registered to, once it has been looked up (null until then).</summary>
+        public StaffRecord CardHolder { get; private set; }
 
         public CaseDefinition Case => CaseLibrary.Get(CaseIndex);
         public bool IsFinalCase => CaseIndex >= CaseLibrary.Count - 1;
@@ -34,6 +36,8 @@ namespace CSIVR.Core
         public event Action<int> CaseSolved;
         /// <summary>Short feedback line for the station panels.</summary>
         public event Action<string> Message;
+        /// <summary>Raised when the access card has been looked up in the staff registry.</summary>
+        public event Action<StaffRecord> CardHolderIdentified;
 
         readonly HashSet<string> m_Recorded = new HashSet<string>();
         readonly HashSet<TutorialStep> m_TutorialDone = new HashSet<TutorialStep>();
@@ -178,6 +182,12 @@ namespace CSIVR.Core
         }
 
         public void Notify(string message) => Message?.Invoke(message);
+
+        public void ReportCardHolder(StaffRecord holder)
+        {
+            CardHolder = holder;
+            CardHolderIdentified?.Invoke(holder);
+        }
 
         /// <summary>Reloading the single scene resets state, held objects, scanner progress, tutorial, doors and UI.</summary>
         public void Restart()
