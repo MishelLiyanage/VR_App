@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using CSIVR.Core;
 using CSIVR.Evidence;
@@ -22,6 +23,17 @@ namespace CSIVR.Interface
         [SerializeField] Transform m_StationAnchor;
 
         CaseManager m_Case;
+        Light[] m_RoomLights;
+        float[] m_RoomLightIntensities;
+        bool[] m_RoomLightEnabled;
+        Light[] m_DirectionalLights;
+        float[] m_DirectionalLightIntensities;
+        bool[] m_DirectionalLightEnabled;
+        Renderer[] m_CeilingLampRenderers;
+        bool[] m_CeilingLampRendererEnabled;
+        Light m_BoardSpotlight;
+        Color m_AmbientLight;
+        float m_AmbientIntensity;
         View m_View;
         string m_Warning;
         string m_LastMessage = "Place a clue on the tray, then let go of it.";
@@ -38,6 +50,8 @@ namespace CSIVR.Interface
 
         void Awake()
         {
+            CacheLighting();
+            CreateBoardSpotlight();
             BuildBoard();
             BuildStationPanel();
         }
@@ -51,16 +65,24 @@ namespace CSIVR.Interface
                 return;
             }
             m_Case.StateChanged += OnStateChanged;
+            m_Case.CaseSolved += OnCaseSolved;
             m_Case.TutorialProgressed += Refresh;
             m_Case.EvidenceRecorded += OnEvidenceRecorded;
             m_Case.Message += OnMessage;
+            RefreshLighting();
             Refresh();
         }
 
         void OnDisable()
         {
             if (m_Case == null) return;
+            RestoreRoomLighting();
+            if (m_Case.CaseIndex == m_CaseIndex)
+                RestoreGlobalLighting();
+            if (m_BoardSpotlight != null)
+                m_BoardSpotlight.enabled = false;
             m_Case.StateChanged -= OnStateChanged;
+            m_Case.CaseSolved -= OnCaseSolved;
             m_Case.TutorialProgressed -= Refresh;
             m_Case.EvidenceRecorded -= OnEvidenceRecorded;
             m_Case.Message -= OnMessage;
@@ -72,10 +94,161 @@ namespace CSIVR.Interface
             m_Warning = null;
             if (m_Case.CaseIndex == m_CaseIndex && m_Case.State == CaseState.Briefing)
                 m_LastMessage = "Place a clue on the tray, then let go of it.";
+            RefreshLighting();
             Refresh();
         }
 
         void OnEvidenceRecorded(string id) => Refresh();
+
+        void OnCaseSolved(int caseIndex)
+        {
+            if (caseIndex == m_CaseIndex - 1)
+                DimRoomLighting();
+        }
+
+        void CacheLighting()
+        {
+            m_AmbientLight = RenderSettings.ambientLight;
+            m_AmbientIntensity = RenderSettings.ambientIntensity;
+
+            var roomLights = new List<Light>();
+            var directionalLights = new List<Light>();
+            foreach (var light in FindObjectsOfType<Light>())
+            {
+                if (light.type == LightType.Directional)
+                {
+                    directionalLights.Add(light);
+                    continue;
+                }
+
+                bool isRoom1 = light.transform.position.z > -3.55f;
+                if (isRoom1 == (m_CaseIndex == 0))
+                    roomLights.Add(light);
+            }
+
+            m_RoomLights = roomLights.ToArray();
+            m_RoomLightIntensities = new float[m_RoomLights.Length];
+            m_RoomLightEnabled = new bool[m_RoomLights.Length];
+            for (int i = 0; i < m_RoomLights.Length; i++)
+            {
+                m_RoomLightIntensities[i] = m_RoomLights[i].intensity;
+                m_RoomLightEnabled[i] = m_RoomLights[i].enabled;
+            }
+
+            m_DirectionalLights = directionalLights.ToArray();
+            m_DirectionalLightIntensities = new float[m_DirectionalLights.Length];
+            m_DirectionalLightEnabled = new bool[m_DirectionalLights.Length];
+            for (int i = 0; i < m_DirectionalLights.Length; i++)
+            {
+                m_DirectionalLightIntensities[i] = m_DirectionalLights[i].intensity;
+                m_DirectionalLightEnabled[i] = m_DirectionalLights[i].enabled;
+            }
+
+            var lampRenderers = new List<Renderer>();
+            foreach (var renderer in FindObjectsOfType<Renderer>())
+            {
+                if (renderer.gameObject.name != "Ceiling Lamp")
+                    continue;
+
+                bool isRoom1 = renderer.transform.position.z > -3.55f;
+                if (isRoom1 == (m_CaseIndex == 0))
+                    lampRenderers.Add(renderer);
+            }
+
+            m_CeilingLampRenderers = lampRenderers.ToArray();
+            m_CeilingLampRendererEnabled = new bool[m_CeilingLampRenderers.Length];
+            for (int i = 0; i < m_CeilingLampRenderers.Length; i++)
+                m_CeilingLampRendererEnabled[i] = m_CeilingLampRenderers[i].enabled;
+        }
+
+        void CreateBoardSpotlight()
+        {
+            if (m_BoardAnchor == null)
+                return;
+
+            var spotlightObject = new GameObject("Briefing Board Spotlight", typeof(Light));
+            spotlightObject.transform.SetParent(transform, true);
+            var target = m_BoardAnchor.position;
+            var position = target - m_BoardAnchor.forward * 1.25f + Vector3.up * 1.3f;
+            spotlightObject.transform.SetPositionAndRotation(position, Quaternion.LookRotation(target - position));
+
+            m_BoardSpotlight = spotlightObject.GetComponent<Light>();
+            m_BoardSpotlight.type = LightType.Spot;
+            m_BoardSpotlight.color = new Color(1f, 0.9f, 0.75f);
+            m_BoardSpotlight.intensity = 5f;
+            m_BoardSpotlight.range = 4.5f;
+            m_BoardSpotlight.spotAngle = 60f;
+            m_BoardSpotlight.shadows = LightShadows.None;
+            m_BoardSpotlight.enabled = false;
+        }
+
+        void RefreshLighting()
+        {
+            bool isCurrentCase = m_Case != null && m_Case.CaseIndex == m_CaseIndex;
+            bool isBriefing = isCurrentCase && m_Case.State == CaseState.Briefing;
+            bool isUpcomingCase = m_Case != null && m_Case.CaseIndex < m_CaseIndex;
+
+            if (isBriefing || isUpcomingCase)
+                DimRoomLighting();
+            else
+                RestoreRoomLighting();
+
+            if (isCurrentCase)
+            {
+                if (isBriefing)
+                    DimGlobalLighting();
+                else
+                    RestoreGlobalLighting();
+            }
+
+            if (m_BoardSpotlight != null)
+                m_BoardSpotlight.enabled = isBriefing;
+        }
+
+        void DimRoomLighting()
+        {
+            for (int i = 0; i < m_RoomLights.Length; i++)
+                if (m_RoomLights[i] != null)
+                    m_RoomLights[i].enabled = false;
+            for (int i = 0; i < m_CeilingLampRenderers.Length; i++)
+                if (m_CeilingLampRenderers[i] != null)
+                    m_CeilingLampRenderers[i].enabled = false;
+        }
+
+        void RestoreRoomLighting()
+        {
+            for (int i = 0; i < m_RoomLights.Length; i++)
+            {
+                if (m_RoomLights[i] == null) continue;
+                m_RoomLights[i].intensity = m_RoomLightIntensities[i];
+                m_RoomLights[i].enabled = m_RoomLightEnabled[i];
+            }
+
+            for (int i = 0; i < m_CeilingLampRenderers.Length; i++)
+                if (m_CeilingLampRenderers[i] != null)
+                    m_CeilingLampRenderers[i].enabled = m_CeilingLampRendererEnabled[i];
+        }
+
+        void DimGlobalLighting()
+        {
+            RenderSettings.ambientLight = Color.black;
+            RenderSettings.ambientIntensity = 0.02f;
+            for (int i = 0; i < m_DirectionalLights.Length; i++)
+                if (m_DirectionalLights[i] != null)
+                    m_DirectionalLights[i].intensity = 0f;
+        }
+
+        void RestoreGlobalLighting()
+        {
+            RenderSettings.ambientLight = m_AmbientLight;
+            RenderSettings.ambientIntensity = m_AmbientIntensity;
+            for (int i = 0; i < m_DirectionalLights.Length; i++)
+            {
+                if (m_DirectionalLights[i] == null) continue;
+                m_DirectionalLights[i].intensity = m_DirectionalLightIntensities[i];
+                m_DirectionalLights[i].enabled = m_DirectionalLightEnabled[i];
+            }
+        }
 
         void OnMessage(string message)
         {
