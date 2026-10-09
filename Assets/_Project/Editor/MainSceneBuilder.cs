@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using UnityEngine.XR.Interaction.Toolkit.Interactors.Casters;
 using UnityEngine.XR.Interaction.Toolkit.Interactors.Visuals;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Turning;
 using UnityEngine.XR.Interaction.Toolkit.UI;
@@ -82,7 +83,48 @@ namespace CSIVR.EditorTools
                 origin.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Floor;
 
             ApplyComfortLocomotion(rig);
+            AllowEvidenceGrabbing(rig);
             return rig;
+        }
+
+        // The Starter Assets Near-Far interactors only see the Default layer (near reach) and Default/UI/layer 31
+        // (far ray). Evidence items live on their own physics layer, so without this the hands cannot grab them.
+        // Adds the Evidence layer to both casters on every hand and keeps whatever layers they already had.
+        static void AllowEvidenceGrabbing(GameObject rig)
+        {
+            int evidenceLayer = LayerMask.NameToLayer(EvidenceLayer);
+            if (evidenceLayer < 0)
+            {
+                Debug.LogWarning($"[MainSceneBuilder] Layer '{EvidenceLayer}' not found; hands will not be able to grab evidence.");
+                return;
+            }
+
+            int evidenceBit = 1 << evidenceLayer;
+            int updated = 0;
+
+            foreach (var caster in rig.GetComponentsInChildren<CurveInteractionCaster>(true))
+                updated += AddLayerBit(caster, "m_RaycastMask.m_Bits", evidenceBit);
+
+            foreach (var caster in rig.GetComponentsInChildren<SphereInteractionCaster>(true))
+                updated += AddLayerBit(caster, "m_PhysicsLayerMask.m_Bits", evidenceBit);
+
+            Debug.Log($"[MainSceneBuilder] Evidence layer added to {updated} interaction caster mask(s).");
+        }
+
+        static int AddLayerBit(Object target, string bitsPath, int bit)
+        {
+            var so = new SerializedObject(target);
+            var bits = so.FindProperty(bitsPath);
+            if (bits == null)
+            {
+                Debug.LogWarning($"[MainSceneBuilder] {target.GetType().Name} has no property '{bitsPath}'.");
+                return 0;
+            }
+
+            // Layer masks are stored unsigned. Writing a negative int into them clamps the mask to 0 (hits nothing).
+            bits.uintValue |= (uint)bit;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return 1;
         }
 
         // Teleport + snap turn only. Continuous move/turn and grab-move stay disabled for comfort.
