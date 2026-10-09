@@ -252,6 +252,10 @@ namespace CSIVR.Core
             "OpenXR Plugin, XR Plug-in Management, Input System, TextMesh Pro - Unity Technologies\n\n" +
             "CONTENT\n" +
             "All rooms and props are original Unity primitives. Textures, UI shapes and sounds are implemented in code.\n" +
+            "SOUND EFFECTS\n" +
+            "Door opening sound - Sound Effect by Jurij from Pixabay\n" +
+            "Background music - Music by Jacob Potison from Pixabay \n" +
+            "CCTV Camera footages - Youtube\n" +
             "The UV scanner is a simplified fictional training device, not a forensic instrument.\n\n";
     }
 }
