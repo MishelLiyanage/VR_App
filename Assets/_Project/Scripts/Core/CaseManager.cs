@@ -24,6 +24,8 @@ namespace CSIVR.Core
         public SubmitResult LastResult { get; private set; }
         /// <summary>Who the access card is registered to, once it has been looked up (null until then).</summary>
         public StaffRecord CardHolder { get; private set; }
+        /// <summary>Who the fingerprint matched in the police database (null until the search has finished).</summary>
+        public CriminalRecord Criminal { get; private set; }
 
         public CaseDefinition Case => CaseLibrary.Get(CaseIndex);
         public bool IsFinalCase => CaseIndex >= CaseLibrary.Count - 1;
@@ -38,6 +40,8 @@ namespace CSIVR.Core
         public event Action<string> Message;
         /// <summary>Raised when the access card has been looked up in the staff registry.</summary>
         public event Action<StaffRecord> CardHolderIdentified;
+        /// <summary>Raised when the fingerprint has been matched in the police criminal database.</summary>
+        public event Action<CriminalRecord> CriminalIdentified;
 
         readonly HashSet<string> m_Recorded = new HashSet<string>();
         readonly HashSet<TutorialStep> m_TutorialDone = new HashSet<TutorialStep>();
@@ -182,6 +186,12 @@ namespace CSIVR.Core
         }
 
         public void Notify(string message) => Message?.Invoke(message);
+
+        public void ReportCriminal(CriminalRecord criminal)
+        {
+            Criminal = criminal;
+            CriminalIdentified?.Invoke(criminal);
+        }
 
         public void ReportCardHolder(StaffRecord holder)
         {

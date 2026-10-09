@@ -146,7 +146,7 @@ namespace CSIVR.Core
                     "then decide why the camera lost its feed.\n\n" +
                     "The UV scanner is on the tool table. Press Start when you are ready.",
                 SubmitPrompt = "All four records are logged.\n\nWhy did camera 3 lose its feed at 19:40?",
-                SubmitFootnote = "A mark shows something was touched, not who touched it.",
+                SubmitFootnote = "A fingerprint match is a lead for the police, not a verdict.",
                 EvidenceIds = new[] { "E05", "E06", "E07", "E08" },
                 Evidence = new Dictionary<string, EvidenceInfo>
                 {
@@ -173,9 +173,9 @@ namespace CSIVR.Core
                     },
                     ["E08"] = new EvidenceInfo
                     {
-                        Title = "UV transfer mark",
-                        Description = "A faint violet smear on the CAM-3 power switch under UV light.",
-                        Observation = "A transfer mark on the CAM-3 power switch shows it was touched.",
+                        Title = "UV fingerprint",
+                        Description = "A faint violet fingerprint on the CAM-3 power switch under UV light.",
+                        Observation = "A fingerprint on the CAM-3 power switch shows it was touched. It can be searched in the police database.",
                         Hint = "Use the UV scanner on the CAM-3 power switch.",
                     },
                 },
@@ -189,7 +189,7 @@ namespace CSIVR.Core
                             "No maintenance was scheduled, the status report shows a sudden power loss with no software fault, " +
                             "the tag identifies the CAM-3 power switch, and the UV mark shows that switch was touched. " +
                             "Together these support the camera being switched off by hand.",
-                        StillUnknown = "Who touched the switch is not established. A mark is not proof of a person's guilt.",
+                        StillUnknown = "A fingerprint match identifies a suspect, but only a court can decide guilt.",
                     },
                     new AnswerOption
                     {
